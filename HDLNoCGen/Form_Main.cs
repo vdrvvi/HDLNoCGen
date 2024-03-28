@@ -440,7 +440,10 @@ namespace HDL_NoC_CodeGen
 
             GC.Collect();
         }
-
+        private void ToolStripMenuItem_Genetare_pathsFile_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Сохранить пути", "debug", System.Windows.Forms.MessageBoxButtons.OK);
+        }
         private void ToolStripMenuItem_Generate_dop_part_module_Click(object sender, EventArgs e) 
         {
             try
@@ -694,7 +697,19 @@ namespace HDL_NoC_CodeGen
 
         private void загрузитьИзФайлаToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Пока не активно", "debug", MessageBoxButtons.OK);
+            var openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    var sr = new StreamReader(openFileDialog.FileName);
+                    textBox_topology_signature.Text = sr.ReadToEnd().Trim();
+                }
+                catch
+                {
+                    MessageBox.Show("Ошибка при чтении файла", "Ошибка", MessageBoxButtons.OK);
+                }
+            }
         }
 
         private void нарисоватьМаршрутToolStripMenuItem_Click(object sender, EventArgs e)
