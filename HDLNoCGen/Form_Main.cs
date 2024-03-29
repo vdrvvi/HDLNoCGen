@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
 
 namespace HDL_NoC_CodeGen
@@ -442,7 +444,65 @@ namespace HDL_NoC_CodeGen
         }
         private void ToolStripMenuItem_Genetare_pathsFile_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Сохранить пути", "debug", System.Windows.Forms.MessageBoxButtons.OK);
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            saveFileDialog.FilterIndex = 2;
+            saveFileDialog.RestoreDirectory = true;
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var fileName = saveFileDialog.FileName;
+                
+                using (var sw = new StreamWriter(fileName))
+                {
+                    var rowFormat = "{0},{1},{2},{3}";
+                    sw.WriteLine(String.Format(
+                            rowFormat,
+                            "Алгоритм",
+                            "A-B",
+                            "Маршрут",
+                            "L"
+                        )
+                    );
+                    if (ToolStripMenuItem_routing_deikstra.Checked)
+                        foreach (ListViewItem item in listView_Deikstra.Items)
+                        {
+                            var str = String.Format(
+                                rowFormat,
+                                "Дейкстра",
+                                item.SubItems[0].Text,
+                                item.SubItems[1].Text,
+                                item.SubItems[2].Text
+                            );
+                            sw.WriteLine(str);
+                        }
+                    if (ToolStripMenuItem_routing_simple.Checked)
+                        foreach (ListViewItem item in listView_Simple.Items)
+                        {
+
+                            var str = String.Format(
+                                rowFormat,
+                                "Почасовой",
+                                item.SubItems[0].Text,
+                                item.SubItems[1].Text,
+                                item.SubItems[2].Text
+                            );
+                            sw.WriteLine(str);
+                        }
+                    if (ToolStripMenuItem_routing_rou.Checked)
+                        foreach (ListViewItem item in listView_ROU.Items)
+                        {
+
+                            var str = String.Format(
+                                rowFormat,
+                                "ROU",
+                                item.SubItems[0].Text,
+                                item.SubItems[1].Text,
+                                item.SubItems[2].Text
+                            );
+                            sw.WriteLine(str);
+                        }
+                }
+            }
         }
         private void ToolStripMenuItem_Generate_dop_part_module_Click(object sender, EventArgs e) 
         {
