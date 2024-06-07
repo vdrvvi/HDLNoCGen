@@ -101,6 +101,7 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.загрузитьПутиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -601,7 +602,9 @@
             this.ToolStripMenuItem_Table_routing_generating,
             this.ToolStripMenuItem_StepCircle_routing_generating,
             this.ToolStripMenuItem_Adaptive_routing_generating,
-            this.ToolStripMenuItem_pair_routing_generating, this.ToolStripMenuItem_Genetare_pathsFile});
+            this.ToolStripMenuItem_pair_routing_generating,
+            this.ToolStripMenuItem_Genetare_pathsFile,
+            this.загрузитьПутиToolStripMenuItem});
             this.ToolStripMenuItem_Generate.Name = "ToolStripMenuItem_Generate";
             this.ToolStripMenuItem_Generate.Size = new System.Drawing.Size(102, 20);
             this.ToolStripMenuItem_Generate.Text = "Сгенерировать";
@@ -753,6 +756,13 @@
             this.label1.TabIndex = 26;
             this.label1.Text = "Собственный маршрут";
             // 
+            // загрузитьПутиToolStripMenuItem
+            // 
+            this.загрузитьПутиToolStripMenuItem.Name = "загрузитьПутиToolStripMenuItem";
+            this.загрузитьПутиToolStripMenuItem.Size = new System.Drawing.Size(397, 34);
+            this.загрузитьПутиToolStripMenuItem.Text = "Загрузить пути";
+            this.загрузитьПутиToolStripMenuItem.Click += new System.EventHandler(this.загрузитьПути_click);
+            // 
             // Form_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -862,6 +872,7 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ToolStripMenuItem загрузитьПутиToolStripMenuItem;
     }
 }
 

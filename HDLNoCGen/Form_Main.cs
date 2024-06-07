@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace HDL_NoC_CodeGen
 {
@@ -442,6 +443,121 @@ namespace HDL_NoC_CodeGen
 
             GC.Collect();
         }
+
+        private bool checkSheetExists(Excel.Workbook wb, string name)
+        {
+            bool found = false;
+            foreach (Excel.Worksheet sheet in wb.Sheets)
+            {
+                if (sheet.Name == name)
+                {
+                    found = true;
+                    break; 
+                }
+            }
+            return found;
+        }
+
+
+        private void загрузитьПути_click(object sender, EventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    Excel.Application excelApp = new Excel.Application();
+                    Excel.Workbook workbook = excelApp.Workbooks.Open(openFileDialog.FileName);
+
+                    graph = new Graph("1 1");
+
+
+                    // Загрузка данных для каждого алгоритма
+                    if (ToolStripMenuItem_routing_deikstra.Checked && checkSheetExists(workbook, "Дейкстра"))
+                    {
+                        graph.Generate_deikstra_routing();
+                        if (listView_Deikstra == null)
+                            listView_Deikstra = new ListView();
+                        loadRoutesFromSheet(workbook, "Дейкстра", listView_Deikstra);
+                    }
+                    if (ToolStripMenuItem_routing_simple.Checked && checkSheetExists(workbook, "Почасовой"))
+                    {
+                        graph.Generate_Simple_routing();
+                        if (listView_Simple == null)
+                            listView_Simple = new ListView();
+                        loadRoutesFromSheet(workbook, "Почасовой", listView_Simple);                     
+                    }
+                    if (ToolStripMenuItem_routing_apm.Checked && checkSheetExists(workbook, "АПМ"))
+                    {
+                        graph.Generate_APM_routing();
+                        if (listView_APM == null)
+                            listView_APM = new ListView();
+                        loadRoutesFromSheet(workbook, "АПМ", listView_APM);
+                    }
+                    if (ToolStripMenuItem_routing_apo.Checked && checkSheetExists(workbook, "АПО"))
+                    {
+                        graph.Generate_APO_routing();
+                        if (listView_APO == null)
+                            listView_APO = new ListView();
+                        loadRoutesFromSheet(workbook, "АПО", listView_APO);
+                    }
+                    if (ToolStripMenuItem_routing_rou.Checked && checkSheetExists(workbook, "ROU"))
+                    {
+                        graph.Generate_ROU_routing();
+                        if (listView_ROU == null)
+                            listView_ROU = new ListView();
+                        loadRoutesFromSheet(workbook, "ROU", listView_ROU);
+                    }
+
+
+                    workbook.Close(false);
+                    excelApp.Quit();
+
+                    MessageBox.Show("Файл успешно прочитан.", "Информация", MessageBoxButtons.OK);
+                }
+                catch
+                {
+                    MessageBox.Show("Ошибка при чтении файла", "Ошибка", MessageBoxButtons.OK);
+                }
+            }
+        }
+
+        private void loadRoutesFromSheet(Excel.Workbook workbook, string sheetName, ListView listView)
+        {
+            Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Worksheets[sheetName];
+            listView.Items.Clear();
+            ListViewItem item;
+
+            for (int row = 2; row <= worksheet.UsedRange.Rows.Count; row++)
+            {
+                string route_name = "";
+                var cell = worksheet.Cells[row, 1] as Excel.Range;
+                if (cell != null && cell.Value != null)
+                    route_name = (string)cell.Value;
+
+                string route = "";
+                var cell2 = worksheet.Cells[row, 2] as Excel.Range;
+                if (cell2 != null && cell2.Value != null)
+                    route = cell2.Value.ToString();
+
+                string route_length = "";
+                var cell3 = worksheet.Cells[row, 3] as Excel.Range;
+                if (cell3 != null && cell3.Value != null)
+                    route_length = cell3.Value.ToString();
+
+                item = new ListViewItem(route_name, row - 3);
+                item.SubItems.Add(route);
+                item.SubItems.Add(route_length);
+                listView.Items.Add(item);
+            }
+        }
+
+        
+
+
+        
+
         private void ToolStripMenuItem_Genetare_pathsFile_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
