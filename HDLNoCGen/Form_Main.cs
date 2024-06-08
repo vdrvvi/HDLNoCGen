@@ -655,6 +655,33 @@ namespace HDL_NoC_CodeGen
                             );
                             sw.WriteLine(str);
                         }
+                    if (ToolStripMenuItem_routing_apm.Checked)
+                        foreach (ListViewItem item in listView_APM.Items)
+                        {
+
+                            var str = String.Format(
+                                rowFormat,
+                                "APM",
+                                item.SubItems[0].Text,
+                                item.SubItems[1].Text,
+                                item.SubItems[2].Text
+                            );
+                            sw.WriteLine(str);
+                        }
+                    if (ToolStripMenuItem_routing_apo.Checked)
+                        foreach (ListViewItem item in listView_APO.Items)
+                        {
+
+                            var str = String.Format(
+                                rowFormat,
+                                "APO",
+                                item.SubItems[0].Text,
+                                item.SubItems[1].Text,
+                                item.SubItems[2].Text
+                            );
+                            sw.WriteLine(str);
+                        }
+
                 }
             }
         }
