@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
+using Plot = ScottPlot;
 
 namespace HDL_NoC_CodeGen
 {
@@ -458,6 +460,42 @@ namespace HDL_NoC_CodeGen
             return found;
         }
 
+        private void создатьDynamicGraph_Click(object sender, EventArgs e)
+        {
+
+            if (listView_Deikstra == null || listView_Deikstra.Items.Count == 0)
+            {
+                MessageBox.Show("Ошибка, нет путей в таблице", "Ошибка", MessageBoxButtons.OK);
+                return; 
+            }
+            Form graphForm = new Form();
+            graphForm.Text = "Динамический график";
+            graphForm.Size = new Size(400, 300);
+            var fp = new Plot.FormsPlot() { Dock = DockStyle.Fill };
+            graphForm.Controls.Add(fp);
+
+            List<double> data = new List<double>();
+
+            for (int j = 0; j < listView_Deikstra.Items.Count; j++)
+            {
+                data.Add(Convert.ToDouble(listView_Deikstra.Items[j].SubItems[2].Text));
+            }
+
+            Plot.Statistics.Histogram hist = new Plot.Statistics.Histogram(
+                min: data.Min(), max: data.Max(), binCount: Convert.ToInt32(data.Max() - data.Min())
+            );
+            hist.AddRange(data);
+            var histogram = fp.Plot.AddBar(values: hist.Counts, positions: hist.Bins);
+            histogram.BarWidth = 1;
+
+            // Настройка графика
+            fp.Plot.XAxis.Label("Значение");
+            fp.Plot.YAxis.Label("Частота");
+            fp.Plot.Title("Распределение длин маршрутов");
+
+            fp.Refresh();
+            graphForm.ShowDialog();
+        }
 
         private void загрузитьПути_click(object sender, EventArgs e)
         {
