@@ -97,9 +97,12 @@
             this.ToolStripMenuItem_pair_routing_generating = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuItemm_Generate_pair_net_connection_file = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuItemm_Generate_pair_select_data_file = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuItem_Genetare_pathsFile = new System.Windows.Forms.ToolStripMenuItem();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.загрузитьПутиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.создатьДинамическийГрафикToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -600,7 +603,10 @@
             this.ToolStripMenuItem_Table_routing_generating,
             this.ToolStripMenuItem_StepCircle_routing_generating,
             this.ToolStripMenuItem_Adaptive_routing_generating,
-            this.ToolStripMenuItem_pair_routing_generating});
+            this.ToolStripMenuItem_pair_routing_generating,
+            this.ToolStripMenuItem_Genetare_pathsFile,
+            this.загрузитьПутиToolStripMenuItem,
+            this.создатьДинамическийГрафикToolStripMenuItem});
             this.ToolStripMenuItem_Generate.Name = "ToolStripMenuItem_Generate";
             this.ToolStripMenuItem_Generate.Size = new System.Drawing.Size(102, 20);
             this.ToolStripMenuItem_Generate.Text = "Сгенерировать";
@@ -719,6 +725,13 @@
             this.ToolStripMenuItemm_Generate_pair_select_data_file.Text = "Модуль выбора данных";
             this.ToolStripMenuItemm_Generate_pair_select_data_file.Click += new System.EventHandler(this.ToolStripMenuItemm_Generate_pair_select_data_file_Click);
             // 
+            // ToolStripMenuItem_Genetare_pathsFile
+            // 
+            this.ToolStripMenuItem_Genetare_pathsFile.Name = "ToolStripMenuItem_Genetare_pathsFile";
+            this.ToolStripMenuItem_Genetare_pathsFile.Size = new System.Drawing.Size(205, 22);
+            this.ToolStripMenuItem_Genetare_pathsFile.Text = "Сохранить пути";
+            this.ToolStripMenuItem_Genetare_pathsFile.Click += new System.EventHandler(this.ToolStripMenuItem_Genetare_pathsFile_Click);
+            // 
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(495, 4);
@@ -745,6 +758,20 @@
             this.label1.TabIndex = 26;
             this.label1.Text = "Собственный маршрут";
             // 
+            // загрузитьПутиToolStripMenuItem
+            // 
+            this.загрузитьПутиToolStripMenuItem.Name = "загрузитьПутиToolStripMenuItem";
+            this.загрузитьПутиToolStripMenuItem.Size = new System.Drawing.Size(397, 34);
+            this.загрузитьПутиToolStripMenuItem.Text = "Загрузить пути";
+            this.загрузитьПутиToolStripMenuItem.Click += new System.EventHandler(this.загрузитьПути_click);
+            //
+            //создатьДинамическийГрафикToolStripMenuItem
+            //
+            this.создатьДинамическийГрафикToolStripMenuItem.Name = "создатьДинамическийГрафикToolStripMenuItem";
+            this.создатьДинамическийГрафикToolStripMenuItem.Size = new System.Drawing.Size(397, 34);
+            this.создатьДинамическийГрафикToolStripMenuItem.Text = "Создать динамический график";
+            this.создатьДинамическийГрафикToolStripMenuItem.Click += new System.EventHandler(this.создатьDynamicGraph_Click);
+            //
             // Form_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -822,6 +849,7 @@
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_Draw_graph;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_Genetare_route_map;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_Genetare_all_files;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_Genetare_pathsFile;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.ListView listView_APM;
@@ -853,6 +881,8 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ToolStripMenuItem загрузитьПутиToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem создатьДинамическийГрафикToolStripMenuItem;
     }
 }
 

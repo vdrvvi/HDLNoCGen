@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
+using Excel = Microsoft.Office.Interop.Excel;
+using Plot = ScottPlot;
 
 namespace HDL_NoC_CodeGen
 {
@@ -441,6 +446,245 @@ namespace HDL_NoC_CodeGen
             GC.Collect();
         }
 
+        private bool checkSheetExists(Excel.Workbook wb, string name)
+        {
+            bool found = false;
+            foreach (Excel.Worksheet sheet in wb.Sheets)
+            {
+                if (sheet.Name == name)
+                {
+                    found = true;
+                    break; 
+                }
+            }
+            return found;
+        }
+
+        private void создатьDynamicGraph_Click(object sender, EventArgs e)
+        {
+
+            if (listView_Deikstra == null || listView_Deikstra.Items.Count == 0)
+            {
+                MessageBox.Show("Ошибка, нет путей в таблице", "Ошибка", MessageBoxButtons.OK);
+                return; 
+            }
+            Form graphForm = new Form();
+            graphForm.Text = "Динамический график";
+            graphForm.Size = new Size(400, 300);
+            var fp = new Plot.FormsPlot() { Dock = DockStyle.Fill };
+            graphForm.Controls.Add(fp);
+
+            List<double> data = new List<double>();
+
+            for (int j = 0; j < listView_Deikstra.Items.Count; j++)
+            {
+                data.Add(Convert.ToDouble(listView_Deikstra.Items[j].SubItems[2].Text));
+            }
+
+            Plot.Statistics.Histogram hist = new Plot.Statistics.Histogram(
+                min: data.Min(), max: data.Max(), binCount: Convert.ToInt32(data.Max() - data.Min())
+            );
+            hist.AddRange(data);
+            var histogram = fp.Plot.AddBar(values: hist.Counts, positions: hist.Bins);
+            histogram.BarWidth = 1;
+
+            // Настройка графика
+            fp.Plot.XAxis.Label("Значение");
+            fp.Plot.YAxis.Label("Частота");
+            fp.Plot.Title("Распределение длин маршрутов");
+
+            fp.Refresh();
+            graphForm.ShowDialog();
+        }
+
+        private void загрузитьПути_click(object sender, EventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    Excel.Application excelApp = new Excel.Application();
+                    Excel.Workbook workbook = excelApp.Workbooks.Open(openFileDialog.FileName);
+
+                    graph = new Graph("1 1");
+
+
+                    // Загрузка данных для каждого алгоритма
+                    if (ToolStripMenuItem_routing_deikstra.Checked && checkSheetExists(workbook, "Дейкстра"))
+                    {
+                        graph.Generate_deikstra_routing();
+                        if (listView_Deikstra == null)
+                            listView_Deikstra = new ListView();
+                        loadRoutesFromSheet(workbook, "Дейкстра", listView_Deikstra);
+                    }
+                    if (ToolStripMenuItem_routing_simple.Checked && checkSheetExists(workbook, "Почасовой"))
+                    {
+                        graph.Generate_Simple_routing();
+                        if (listView_Simple == null)
+                            listView_Simple = new ListView();
+                        loadRoutesFromSheet(workbook, "Почасовой", listView_Simple);                     
+                    }
+                    if (ToolStripMenuItem_routing_apm.Checked && checkSheetExists(workbook, "АПМ"))
+                    {
+                        graph.Generate_APM_routing();
+                        if (listView_APM == null)
+                            listView_APM = new ListView();
+                        loadRoutesFromSheet(workbook, "АПМ", listView_APM);
+                    }
+                    if (ToolStripMenuItem_routing_apo.Checked && checkSheetExists(workbook, "АПО"))
+                    {
+                        graph.Generate_APO_routing();
+                        if (listView_APO == null)
+                            listView_APO = new ListView();
+                        loadRoutesFromSheet(workbook, "АПО", listView_APO);
+                    }
+                    if (ToolStripMenuItem_routing_rou.Checked && checkSheetExists(workbook, "ROU"))
+                    {
+                        graph.Generate_ROU_routing();
+                        if (listView_ROU == null)
+                            listView_ROU = new ListView();
+                        loadRoutesFromSheet(workbook, "ROU", listView_ROU);
+                    }
+
+
+                    workbook.Close(false);
+                    excelApp.Quit();
+
+                    MessageBox.Show("Файл успешно прочитан.", "Информация", MessageBoxButtons.OK);
+                }
+                catch
+                {
+                    MessageBox.Show("Ошибка при чтении файла", "Ошибка", MessageBoxButtons.OK);
+                }
+            }
+        }
+
+        private void loadRoutesFromSheet(Excel.Workbook workbook, string sheetName, ListView listView)
+        {
+            Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Worksheets[sheetName];
+            listView.Items.Clear();
+            ListViewItem item;
+
+            for (int row = 2; row <= worksheet.UsedRange.Rows.Count; row++)
+            {
+                string route_name = "";
+                var cell = worksheet.Cells[row, 1] as Excel.Range;
+                if (cell != null && cell.Value != null)
+                    route_name = (string)cell.Value;
+
+                string route = "";
+                var cell2 = worksheet.Cells[row, 2] as Excel.Range;
+                if (cell2 != null && cell2.Value != null)
+                    route = cell2.Value.ToString();
+
+                string route_length = "";
+                var cell3 = worksheet.Cells[row, 3] as Excel.Range;
+                if (cell3 != null && cell3.Value != null)
+                    route_length = cell3.Value.ToString();
+
+                item = new ListViewItem(route_name, row - 3);
+                item.SubItems.Add(route);
+                item.SubItems.Add(route_length);
+                listView.Items.Add(item);
+            }
+        }
+
+        
+
+
+        
+
+        private void ToolStripMenuItem_Genetare_pathsFile_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            saveFileDialog.FilterIndex = 2;
+            saveFileDialog.RestoreDirectory = true;
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var fileName = saveFileDialog.FileName;
+                
+                using (var sw = new StreamWriter(fileName))
+                {
+                    var rowFormat = "{0},{1},{2},{3}";
+                    sw.WriteLine(String.Format(
+                            rowFormat,
+                            "Алгоритм",
+                            "A-B",
+                            "Маршрут",
+                            "L"
+                        )
+                    );
+                    if (ToolStripMenuItem_routing_deikstra.Checked)
+                        foreach (ListViewItem item in listView_Deikstra.Items)
+                        {
+                            var str = String.Format(
+                                rowFormat,
+                                "Дейкстра",
+                                item.SubItems[0].Text,
+                                item.SubItems[1].Text,
+                                item.SubItems[2].Text
+                            );
+                            sw.WriteLine(str);
+                        }
+                    if (ToolStripMenuItem_routing_simple.Checked)
+                        foreach (ListViewItem item in listView_Simple.Items)
+                        {
+
+                            var str = String.Format(
+                                rowFormat,
+                                "Почасовой",
+                                item.SubItems[0].Text,
+                                item.SubItems[1].Text,
+                                item.SubItems[2].Text
+                            );
+                            sw.WriteLine(str);
+                        }
+                    if (ToolStripMenuItem_routing_rou.Checked)
+                        foreach (ListViewItem item in listView_ROU.Items)
+                        {
+
+                            var str = String.Format(
+                                rowFormat,
+                                "ROU",
+                                item.SubItems[0].Text,
+                                item.SubItems[1].Text,
+                                item.SubItems[2].Text
+                            );
+                            sw.WriteLine(str);
+                        }
+                    if (ToolStripMenuItem_routing_apm.Checked)
+                        foreach (ListViewItem item in listView_APM.Items)
+                        {
+
+                            var str = String.Format(
+                                rowFormat,
+                                "APM",
+                                item.SubItems[0].Text,
+                                item.SubItems[1].Text,
+                                item.SubItems[2].Text
+                            );
+                            sw.WriteLine(str);
+                        }
+                    if (ToolStripMenuItem_routing_apo.Checked)
+                        foreach (ListViewItem item in listView_APO.Items)
+                        {
+
+                            var str = String.Format(
+                                rowFormat,
+                                "APO",
+                                item.SubItems[0].Text,
+                                item.SubItems[1].Text,
+                                item.SubItems[2].Text
+                            );
+                            sw.WriteLine(str);
+                        }
+
+                }
+            }
+        }
         private void ToolStripMenuItem_Generate_dop_part_module_Click(object sender, EventArgs e) 
         {
             try
@@ -694,7 +938,19 @@ namespace HDL_NoC_CodeGen
 
         private void загрузитьИзФайлаToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Пока не активно", "debug", MessageBoxButtons.OK);
+            var openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    var sr = new StreamReader(openFileDialog.FileName);
+                    textBox_topology_signature.Text = sr.ReadToEnd().Trim();
+                }
+                catch
+                {
+                    MessageBox.Show("Ошибка при чтении файла", "Ошибка", MessageBoxButtons.OK);
+                }
+            }
         }
 
         private void нарисоватьМаршрутToolStripMenuItem_Click(object sender, EventArgs e)
